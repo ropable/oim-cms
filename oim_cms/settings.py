@@ -31,6 +31,7 @@ INSTALLED_APPS = (
     'reversion',
     'mptt',
     'leaflet',
+    'rest_framework',
 
     'wagtail.wagtailcore',
     'wagtail.wagtailadmin',
