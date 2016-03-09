@@ -209,7 +209,7 @@ class OptionResource(DjangoResource):
         return getattr(self, "data_" + self.request.GET["list"])()
 
     def data_cost_centre(self):
-        return ["{} {}".format(
+        return ["CC{} / {}".format(
             *c) for c in CostCentre.objects.all().values_list("code", "org_position__name")]
 
     def data_dept_user(self):
@@ -220,11 +220,32 @@ class OptionResource(DjangoResource):
         return ["{} {}".format(
             *s) for s in ITSystem.objects.all().values_list("system_id", "name")]
 
+    def data_statuslogin(self):
+        return [l[1] for l in list(ITSystem.STATUS_CHOICES) + list(ITSystem.ACCESS_CHOICES) + list(ITSystem.AUTHENTICATION_CHOICES)]
+
     def data_location(self):
-        return [l.name for l in Location.objects.all()]
+        return [l.name for l in Location.objects.all().order_by('name')]
 
     def data_division(self):
-        return [i.name for i in OrgUnit.objects.filter(unit_type=1)]
+        return [i.name for i in OrgUnit.objects.filter(unit_type=1).order_by('name')]
+
+    def data_dept(self):
+        return [i.acronym for i in OrgUnit.objects.filter(unit_type=0, acronym__gt="").order_by('name')]
+
+    def data_department(self):
+        return [i.name for i in OrgUnit.objects.filter(unit_type=0).order_by('name')]
+
+    def data_branch(self):
+        return [i.name for i in OrgUnit.objects.filter(unit_type=2).order_by('name')]
+
+    def data_section(self):
+        return [i.name for i in OrgUnit.objects.filter(unit_type=7).order_by('name')]
+
+    def data_regiondistrict(self):
+        return [i.name for i in OrgUnit.objects.filter(unit_type__in=[3,6]).order_by('name')]
+
+    def data_office(self):
+        return [i.name for i in OrgUnit.objects.filter(unit_type=5).order_by('name')]
 
 
 class whoamiResource(DjangoResource):
@@ -422,7 +443,7 @@ class UserResource(DjangoResource):
         "pk", "name", "title", "employee_id", "email", "telephone", "mobile_phone", "photo", "photo_ad",
         "org_data", "parent__email", "parent__name", "username", "org_unit__location__id", "org_unit__location__name",
         "org_unit__location__address", "org_unit__location__pobox", "org_unit__location__phone",
-        "org_unit__location__fax", "ad_guid"
+        "org_unit__location__fax", "ad_guid", "notes", "working_hours", "org_unit__secondary_location__name"
     )
     VALUES_ARGS = COMPACT_ARGS + (
         "ad_dn", "ad_data", "date_updated", "date_ad_updated", "active", "ad_deleted",

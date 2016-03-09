@@ -52,7 +52,8 @@ INSTALLED_APPS = (
     'tracking',
     'registers',
     'core',
-    'mudmap'
+    'mudmap',
+    'postgrest'
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -215,6 +216,8 @@ PEEPERS_URL = env('PEEPERS_URL', None)
 INTERNAL_USER = env('INTERNAL_USER', None)
 FRESHDESK_ENDPOINT = env('FRESHDESK_ENDPOINT', None)
 FRESHDESK_AUTH = (env('FRESHDESK_KEY'), 'X')
+POSTGREST_ROLE = env('POSTGREST_ROLE', 'postgrest')
+POSTGREST_BINARY = env('POSTGREST_BINARY', '/usr/local/bin/postgrest')
 
 # Email settings
 EMAIL_HOST = env('EMAIL_HOST', None)

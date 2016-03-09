@@ -29,13 +29,7 @@ $(document).ready(function () {
           var inview = images.filter(function() {
             var $e = $(this);
             if ($e.is(":hidden")) return;
-
-            var wt = $w.scrollTop(),
-                wb = wt + $w.height(),
-                et = $e.offset().top,
-                eb = et + $e.height();
-
-            return eb >= wt - th && et <= wb + th;
+            return true;
           });
 
           loaded = inview.trigger("unveil");
@@ -84,7 +78,7 @@ $(document).ready(function () {
         $("#wagtail-userbar").removeAttr("style").length && clearInterval(fixwtub);
     }, 100);
 
-    window.loadDatalist = function(listid) {
+    window.loadDatalist = function(listid, source) {
         if ($("#"+listid).length == 1) { return; }
         if (localStorage.getItem("list_"+listid)) {
             var datalist = $("<datalist/>", {id: listid});
@@ -92,18 +86,25 @@ $(document).ready(function () {
                 $("<option/>").text(value).appendTo(datalist);
             });
             $("body").append(datalist);
-        } 
-        $.get("/api/options?list=" + listid, function(data) {
-            localStorage.setItem("list_"+listid, JSON.stringify(data.objects));
-            loadDatalist(listid);
-        });
+        }
+        if (source) {
+            $.get(source, function(data) {
+                localStorage.setItem("list_"+listid, JSON.stringify($.map(data, function(i) { return i[Object.keys(i)] })));
+                loadDatalist(listid);
+            });
+        } else {
+            $.get("/api/options?list=" + listid, function(data) {
+                localStorage.setItem("list_"+listid, JSON.stringify(data.objects));
+                loadDatalist(listid);
+            });
+        }
     }
 
     // form upgrades
     window.upgradeForms = function() {
         $("input[type=date]").fdatepicker({format: "dd/mm/yyyy"}).attr({placeholder: "dd/mm/yyyy"});
         // Find all inputs on the DOM which are bound to a datalist via their list attribute.
-        $('input[list]').on("change", function() {
+        $('input[list]').on("input", function() {
             // use the setCustomValidity function of the Validation API
             // to provide an user feedback if the value does not exist in the datalist
             var value = this.value;
@@ -113,7 +114,7 @@ $(document).ready(function () {
               this.setCustomValidity('Please select a valid value.');
             }
         }).each(function() { 
-            if (this.list == null) { loadDatalist($(this).attr("list")); }
+            if (this.list == null) { loadDatalist($(this).attr("list"), $(this).attr("data-src")); }
         });
     }
 
@@ -132,9 +133,9 @@ $(document).ready(function () {
             localforage.getItem(url).then(function(data) {
                 if (data) { _renderHandlebars(tmpl, data, callback) }
                 $.get(url, function(rawdata) {
-                    var data = Handlebars.compile(tmpl.html())(rawdata);
-                    localforage.setItem(url, data);
-                    if (!data) { _renderHandlebars(tmpl, data, callback) }
+                    var comp_data = Handlebars.compile(tmpl.html())(rawdata);
+                    localforage.setItem(url, comp_data);
+                    if (!data) { _renderHandlebars(tmpl, comp_data, callback) }
                 });
             });
         });
