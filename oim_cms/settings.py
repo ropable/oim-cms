@@ -252,3 +252,12 @@ WAGTAIL_USAGE_COUNT_ENABLED = True
 
 # we want a custom search result template
 WAGTAILSEARCH_RESULTS_TEMPLATE = 'core/search_results.html'
+
+# django-rest-framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
+    'PAGINATE_BY': 20,
+    'PAGINATE_BY_PARAM': 'page_size',
+}

@@ -1,4 +1,4 @@
-from django.conf.urls import include, url, handler404
+from django.conf.urls import include, url
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -7,11 +7,19 @@ from wagtail.wagtailadmin import urls as wagtailadmin_urls
 from wagtail.wagtaildocs import urls as wagtaildocs_urls
 from wagtail.wagtailcore import urls as wagtail_urls
 
+from rest_framework.routers import DefaultRouter
+
 from core import views
 from oim_cms import api
+from tracking.views import DepartmentUserViewSet
 
 admin.site.site_header = 'OIM CMS Database Administration'
 
+# django-rest-framework router
+router = DefaultRouter()
+router.register(r'departmentusers', DepartmentUserViewSet)
+
+# restless API patterns
 api_patterns = [
     url(r'^freshdesk', api.freshdesk, name="api_freshdesk"),
     url(r'^ec2_instances', include(api.EC2InstanceResource.urls())),
@@ -37,7 +45,8 @@ urlpatterns = [
     url(r'^logout', views.logout_view, name='logout'),
     url(r'^documents/', include(wagtaildocs_urls)),
 
-    url(r'^api/', include(api_patterns)),
+    url(r'^api/', include(router.urls)),  # django-rest-framework patterns
+    url(r'^api/', include(api_patterns)),  # restless patterns
     url(r'^api/{}/'.format(settings.API_SECRET), include(api_patterns)),
 
     url(r'', include('social.apps.django_app.urls', namespace='social')),
