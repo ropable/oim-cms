@@ -15,6 +15,10 @@ from oim_cms.api import api_urlpatterns
 admin.site.site_header = 'OIM CMS Database Administration'
 
 urlpatterns = [
+    url(r'^fobi/plugins/form-handlers/db-store/',
+        include('fobi.contrib.plugins.form_handlers.db_store.urls')),
+    url(r'^fobi/', include('fobi.urls.view')),
+    url(r'^fobi/', include('fobi.urls.edit')),
     url(r'^approvals/', include(approvals_urls)),
     url(r'^knowledge/', include(knowledge_urls)),
     url(r'^catalogue/', include(catalogue_urls)),

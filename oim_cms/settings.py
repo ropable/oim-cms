@@ -24,6 +24,7 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
@@ -54,6 +55,48 @@ INSTALLED_APPS = (
 
     'social.apps.django_app.default',
 
+    # django-fobi
+    'fobi',
+    'fobi.contrib.themes.simple', # Simple theme
+    # `django-fobi` form elements - fields
+    'fobi.contrib.plugins.form_elements.fields.boolean',
+    'fobi.contrib.plugins.form_elements.fields.checkbox_select_multiple',
+    'fobi.contrib.plugins.form_elements.fields.date',
+    'fobi.contrib.plugins.form_elements.fields.date_drop_down',
+    'fobi.contrib.plugins.form_elements.fields.datetime',
+    'fobi.contrib.plugins.form_elements.fields.decimal',
+    'fobi.contrib.plugins.form_elements.fields.email',
+    'fobi.contrib.plugins.form_elements.fields.file',
+    'fobi.contrib.plugins.form_elements.fields.float',
+    'fobi.contrib.plugins.form_elements.fields.hidden',
+    'fobi.contrib.plugins.form_elements.fields.input',
+    'fobi.contrib.plugins.form_elements.fields.integer',
+    'fobi.contrib.plugins.form_elements.fields.ip_address',
+    'fobi.contrib.plugins.form_elements.fields.null_boolean',
+    'fobi.contrib.plugins.form_elements.fields.password',
+    'fobi.contrib.plugins.form_elements.fields.radio',
+    'fobi.contrib.plugins.form_elements.fields.regex',
+    'fobi.contrib.plugins.form_elements.fields.select',
+    'fobi.contrib.plugins.form_elements.fields.select_model_object',
+    'fobi.contrib.plugins.form_elements.fields.select_multiple',
+    'fobi.contrib.plugins.form_elements.fields.select_multiple_model_objects',
+    'fobi.contrib.plugins.form_elements.fields.slug',
+    'fobi.contrib.plugins.form_elements.fields.text',
+    'fobi.contrib.plugins.form_elements.fields.textarea',
+    'fobi.contrib.plugins.form_elements.fields.time',
+    'fobi.contrib.plugins.form_elements.fields.url',
+    # `django-fobi` form elements - content elements
+    'fobi.contrib.plugins.form_elements.test.dummy',
+    'easy_thumbnails', # Required by `content_image` plugin
+    'fobi.contrib.plugins.form_elements.content.content_image',
+    'fobi.contrib.plugins.form_elements.content.content_text',
+    'fobi.contrib.plugins.form_elements.content.content_video',
+    # `django-fobo` form handlers
+    'fobi.contrib.plugins.form_handlers.db_store',
+    'fobi.contrib.plugins.form_handlers.http_repost',
+    'fobi.contrib.plugins.form_handlers.mail',
+
+    # Project-specific applications
     'organisation',
     'tracking',
     'registers',
@@ -174,6 +217,8 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
+                'fobi.context_processors.theme',  # Obligatory
+                'fobi.context_processors.dynamic_values',  # Optional
                 'oim_cms.context_processors.template_context',
             ],
         },
@@ -237,6 +282,9 @@ WAGTAILADMIN_RICH_TEXT_EDITORS = {
     },
 }
 
+# django-fobi settings
+FOBI_DEFAULT_THEME = 'simple'
+FOBI_RESTRICT_PLUGIN_ACCESS = False
 
 # Logging settings
 # Ensure that the logs directory exists:
@@ -266,7 +314,7 @@ LOGGING = {
             'maxBytes': 1024 * 1024 * 5,
             'backupCount': 5,
         },
-        'ad_file' : {
+        'ad_file': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(BASE_DIR, 'logs', 'ad_sync_actions.log'),
@@ -284,12 +332,12 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'INFO'
         },
-        'organisation' : {
+        'organisation': {
             'handlers': ['file'],
             'level': 'DEBUG'
         },
-        'ad_sync' : {
-            'handlers' : ['ad_file'],
+        'ad_sync': {
+            'handlers': ['ad_file'],
             'level': 'INFO'
         }
     }
