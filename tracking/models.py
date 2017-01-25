@@ -264,12 +264,19 @@ class FreshdeskTicket(models.Model):
 
     def match_it_system(self):
         """Attempt to locate a matching IT System object to associate with.
-        Note that this match will probably stop working whenever anyone alters
-        the support_subcategory field values in Freshdesk, so we might need a
-        more robust method in future.
+        First try matching on ``it_system_register_id`` in the custom_fields
+        dict, second try matching on category (``Applications``) & subcategory
+        (``NAME_OF_APPLICATION``) fields.
+        Note that the 2nd match will probably stop working whenever anyone alters
+        the support_subcategory field values in Freshdesk.
         """
         from registers.models import ITSystem
-        if self.is_support_category('Applications'):
+        if 'it_system_register_id' in self.custom_fields and self.custom_fields['it_system_register_id']:
+            sys_id = self.custom_fields['it_system_register_id']
+            if ITSystem.objects.filter(system_id=sys_id).exists():
+                self.it_system = ITSystem.objects.get(system_id=sys_id)
+                self.save()
+        elif self.is_support_category('Applications'):
             if 'support_subcategory' in self.custom_fields and self.custom_fields['support_subcategory']:
                 sub = self.custom_fields['support_subcategory']
                 # Split on the unicode 'long hyphen':
